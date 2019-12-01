@@ -1,0 +1,6 @@
+*.exe
+*.sw?
+*.ps1
+
+# Ignore all build directories
+**/build*
