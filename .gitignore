@@ -2,5 +2,6 @@
 *.sw?
 *.ps1
 
-# Ignore all build directories
+# ignore directories
 **/build*
+**/.clangd
