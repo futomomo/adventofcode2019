@@ -35,7 +35,7 @@ program* prgLoad(const char* filename, const char* mode)
   fseek(prgfile, 0L, SEEK_END);
   prgFileLen = ftell(prgfile);
   rewind(prgfile);
-  
+
   if(prgFileLen == 0L)
     return NULL;
 
@@ -59,7 +59,7 @@ program* prgLoad(const char* filename, const char* mode)
     return NULL;
   }
 
-  fclose(prgfile); 
+  fclose(prgfile);
 
   size_t stringLength = strlen(programString);
   if(stringLength == 0L)
@@ -74,7 +74,7 @@ program* prgLoad(const char* filename, const char* mode)
   {
     if(programString[i] == ',')
       ++delimCount;
-  } 
+  }
 
   prog->prg = malloc(sizeof(int)*(delimCount));
  // printf("Allocating memory for prog->prg of size %d\n", sizeof(int)*(delimCount+1));

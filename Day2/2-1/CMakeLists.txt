@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 project(day2-1 LANGUAGES C)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(CMAKE_C_STANDARD 99)
 set(default_build_type "Release")
 option(RELEASE_BUILD "Make a release build, otherwise defaults to debug." OFF)
