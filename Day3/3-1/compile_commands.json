@@ -1,0 +1,7 @@
+[
+{
+  "directory": "C:/dev/adventofcode2019/Day3/3-1/build",
+  "command": "C:\\Mjukvara\\LLVM\\bin\\clang.exe   -g -Xclang -gcodeview -O0 -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd   -D_CRT_SECURE_NO_WARNINGS -o CMakeFiles\\day3-1.dir\\src\\main.c.obj   -c C:\\dev\\adventofcode2019\\Day3\\3-1\\src\\main.c",
+  "file": "C:/dev/adventofcode2019/Day3/3-1/src/main.c"
+}
+]
