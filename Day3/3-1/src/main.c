@@ -1,21 +1,20 @@
 #include <stdio.h>
-#include <limits.h>
+#include <stdlib.h>
+#include <math.h>
+#include <float.h>
 
-typedef struct vec2
+typedef struct
 {
-	int x, y;
-} Vec2;
+	double x, y;
+} Point;
 
-typedef struct line
-{
-	Vec2 pos1, pos2;
-} Line;
 
-int lineIntersect(Line line1, Line line2);
+double lineIntersect(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
+Point intersectPoint(Point a1, Point a2, Point b1, Point b2);
 
-Vec2 wires[2][302] = {0,0};
-Vec2 lastPos;
-int shortestDist = INT_MAX;
+Point wires[2][302] = {0,0};
+Point lastPos;
+double shortestDist = 0.0l;
 
 int main(void)
 {
@@ -30,7 +29,7 @@ int main(void)
 	}
 	for(int i = 0; i < 2; i++)
 	{
-		lastPos = (struct vec2){0,0};
+		lastPos = (Point){0,0};
 		wires[i][0] = lastPos;
 		wireIndex = 1;
 		do
@@ -53,20 +52,7 @@ int main(void)
 						break;
 			}
 			wires[i][wireIndex] = lastPos;
-			// printf("x: %d, y: %d\n", wires[i][wireIndex].x, wires[i][wireIndex].y);
-			// it only counts if a wire crosses another
-			if(i > 0 && wireIndex > 0)
-			{
-				Line currentLine = {wires[i][wireIndex-1], wires[i][wireIndex]};
-				// both wires are 302 long so just hardcode it
-				for(int j = 1; j < 302; j++)
-				{
-					Line testLine = {wires[i-1][j-1], wires[i-1][1]};
-					int dist = lineIntersect(currentLine, testLine);
-					if(dist < shortestDist)
-						shortestDist = dist;
-				}
-			}
+			printf("x: %f, y: %f\n", wires[i][wireIndex].x, wires[i][wireIndex].y);
 			++wireIndex;
 		} while((delim = fgetc(input)) == ',' && !ferror(input));
 
@@ -79,19 +65,54 @@ int main(void)
 		if(ferror(input))
 		{
 			printf("File error");
-			break;
+			return -1;
+		}
+	}
+
+	fclose(input);
+
+	printf("%f, %f, %f, %f\n", wires[0][0].x, wires[0][0].y, wires[1][0].x, wires[1][0].y);
+	double intersect = 0.0l;
+	for(int i = 1; i < wireIndex; i++)
+	{
+		for(int j = 1; j < wireIndex; j++)
+		{
+			intersect = lineIntersect(wires[0][i-1].x, wires[0][i-1].y, wires[0][i].x, wires[0][i].y, wires[1][j-1].x, wires[1][j-1].y, wires[1][j].x, wires[1][j].y);
+			if(intersect != 0.0l)
+				printf("Manhattan length: %f\n", intersect);
 		}
 	}
 
 
-	fclose(input);
 	return 0;
 }
 
-int lineIntersect(Line line1, Line line2)
+// returns 0.0l when there's no intersection
+double lineIntersect(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
 {
-	int manhatDist = 0;
-	int noCollide = (line1.pos1.x -line1.pos2.x)*(line2.pos1.y - line2.pos2.y) - (line1.pos1.y - line1.pos2.y)*(line2.pos1.x-line2.pos2.x);
-	if(noCollide == 0)
-		return INT_MAX;
+	double denominator = (double)((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
+	//printf("denominator: %f\n", denominator);
+	if(denominator == 0.0l)
+		return 0.0l;
+
+	double t = (double)((x1-x3)*(y3-y4)-(y1-y3)*(x3-x4));
+	t = t/denominator;
+	double u = (double)((x1-x2)*(y1-y3)-(y1-y2)*(x1-x3));
+	u = -(u/denominator);
+
+	if(0.0l >= t || t >= 1.0l || 0.0l >= u || u >= 1.0l)
+		return 0.0l;
+
+	double x, y;
+	x = ((double)x1+(t*(double)(x2-x1)));
+	y = ((double)y1+(t*(double)(y2-y1)));
+
+	return 0.0l;
+}
+
+
+Point intersectPoint(Point a1, Point a2, Point b1, Point b2)
+{
+	Point c;
+
 }
