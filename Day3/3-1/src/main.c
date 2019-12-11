@@ -8,9 +8,7 @@ typedef struct _point
 	double x, y;
 } Point;
 
-double lineIntersect(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
-//Point intersectPoint(Point a1, Point a2, Point b1, Point b2);
-double slope(Point p1, Point p2);
+int ptIntersect(Point a1, Point a2, Point b1, Point b2, Point* c);
 
 Point wires[2][302] = {{{0.0l,0.0l}}};
 Point lastPos = {0.0l, 0.0l};
@@ -71,15 +69,18 @@ int main(void)
 
 	fclose(input);
 
-	printf("%f, %f, %f, %f\n", wires[0][0].x, wires[0][0].y, wires[1][0].x, wires[1][0].y);
-	double intersect = 0.0l;
+	Point intersect = {0.0l, 0.0l};
+	int manhatDist = 0, valid = 0;
 	for(int i = 1; i < wireIndex; i++)
 	{
 		for(int j = 1; j < wireIndex; j++)
 		{
-			intersect = lineIntersect(wires[0][i-1].x, wires[0][i-1].y, wires[0][i].x, wires[0][i].y, wires[1][j-1].x, wires[1][j-1].y, wires[1][j].x, wires[1][j].y);
-			if(intersect != 0.0l)
-				printf("Manhattan length: %f\n", intersect);
+			if(i == 1 && j == 1)
+				continue;
+			valid = ptIntersect(wires[0][i-1], wires[0][i], wires[1][j-1], wires[1][j], &intersect);
+			if(valid)
+			{
+			}
 		}
 	}
 
@@ -87,36 +88,20 @@ int main(void)
 	return 0;
 }
 
-// returns 0.0l when there's no intersection
-double lineIntersect(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
+// returns 1 on intersection found and 0 on not found
+int ptIntersect(Point a1, Point a2, Point b1, Point b2, Point* c)
 {
-	double denominator = (double)((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
-	//printf("denominator: %f\n", denominator);
-	if(denominator == 0.0l)
-		return 0.0l;
+	(*c) = (Point){0.0l, 0.0l};
+	double denom = (a1.x - a2.x) * (b1.y - b2.y) - (a1.y - a2.y) * (b1.x - b2.x);
+	if(denom == 0)
+		return 0;
 
-	double t = (double)((x1-x3)*(y3-y4)-(y1-y3)*(x3-x4));
-	t = t/denominator;
-	double u = (double)((x1-x2)*(y1-y3)-(y1-y2)*(x1-x3));
-	u = -(u/denominator);
+	double t = ((a1.x - b1.x) * (b1.y - b2.y) - (a1.y - b1.y) * (b1.x - b2.x))/denom;
+	double u = ((a1.x - a2.x) * (a1.y - b1.y) - (a1.y - a2.y) * (a1.x - b1.x))/denom;
+	if(t < 0.0l || 1.0l < t || u < 0.0l || 1.0l < u)
+		return 0;
 
-	if(0.0l >= t || t >= 1.0l || 0.0l >= u || u >= 1.0l)
-		return 0.0l;
-
-	double x, y;
-	x = ((double)x1+(t*(double)(x2-x1)));
-	y = ((double)y1+(t*(double)(y2-y1)));
-
-	return 0.0l;
+	c->x = (a1.x + (t * (a2.x - a1.x)));
+	c->y = (a1.y + (t * (a2.y - a1.y)));
+	return 1;
 }
-
-double slope(Point p1, Point p2)
-{
-	return 0.0l;
-}
-
-/*Point intersectPoint(Point a1, Point a2, Point b1, Point b2)
-{
-	Point c;
-
-}*/
