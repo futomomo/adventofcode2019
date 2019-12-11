@@ -16,24 +16,19 @@ typedef enum _direction
 	DOWN = 'D'
 } Direction;
 
+
+// steps is the total amount of steps taken until this node is reached
 typedef struct _vec2
 {
 	Point pos;
 	Direction direction;
 	int size;
+	int steps;
 } Vec2;
 
 
 int ptIntersect(Point a1, Point a2, Point b1, Point b2, Point* c);
 int vecIntersect(Vec2 vector1, Vec2 vector2, Point* c);
-
-Vec2 vectors[2][400];
-int vectorIndex = 0;
-Point wires[2][302] = {{{0.0,0.0}}};
-Point lastPos = {0.0, 0.0};
-Point collisionList[1000] = {{0.0,0.0}};
-int collisions = 0;
-double shortestDist = 0.0;
 
 void printPoint(Point p)
 {
@@ -43,24 +38,37 @@ void printPoint(Point p)
 void printVec2(Vec2 vector)
 {
 	printPoint(vector.pos);
-	printf("Raw: %c%d\n", (char)vector.direction, vector.size);
+	printf("Raw: %c%d, steps: %d\n", (char)vector.direction, vector.size, vector.steps);
 }
 
-int main(void)
+Vec2 vectors[2][400];
+int vectorIndex = 0;
+int stepCount = 0;
+Point lastPos = {0.0, 0.0};
+Point collisionList[1000] = {{0.0,0.0}};
+int collisions = 0;
+double shortestDist = 0.0;
+
+int main(int argc, char* argv[])
 {
 	char direction;
-	int length, delim, wireIndex;
+	char* fileName = "input.txt";
+	int length, delim;
+	if(argc > 1)
+		fileName = argv[1];
 
-	FILE* input = fopen("input.txt", "r");
+	printf("Opening %s\n", fileName);
+	FILE* input = fopen(fileName, "r");
 	if(!input)
 	{
-		printf("Failed to get input.\n");
+		printf("Failed to open input file.\n");
 		return -1;
 	}
 	for(int i = 0; i < 2; i++)
 	{
 		lastPos = (Point){0.0,0.0};
 		vectorIndex = 0;
+		stepCount = 0;
 		do
 		{
 			fscanf(input, "%c%d", &direction, &length);
@@ -68,6 +76,7 @@ int main(void)
 			vectors[i][vectorIndex].direction = (Direction)direction;
 			vectors[i][vectorIndex].size = length;
 			vectors[i][vectorIndex].pos = lastPos;
+			vectors[i][vectorIndex].steps = stepCount;
 			switch(direction)
 			{
 				case UP:
@@ -88,10 +97,11 @@ int main(void)
 						break;
 
 			}
-			printf("wire: %d, index: %d\n", i, vectorIndex);
-			printVec2(vectors[i][vectorIndex]);
-			printPoint(lastPos);
-			printf("\n");
+			//printf("wire: %d, index: %d\n", i, vectorIndex);
+			//printVec2(vectors[i][vectorIndex]);
+			//printPoint(lastPos);
+			//printf("\n");
+			stepCount += length;
 			vectorIndex++;
 		} while((delim = fgetc(input)) == ',' && !ferror(input));
 
@@ -114,29 +124,39 @@ int main(void)
 
 	int valid;
 	Point result;
-	double manhatDist = 0.0, shortestDist = 0.0;
+	int minSteps = 0, steps = 0;
 	for(int i = 0; i < vectorIndex; i++)
 	{
 		for(int cmpIndex = 0; cmpIndex < vectorIndex; cmpIndex++)
 		{
+			// skip first inital wire vectors since they collide at 0,0
+			// (although the collide check function doesn't allow 2 parrallel lines to collide anyway)
 			if(i == 0 && cmpIndex == 0)
 				continue;
 			valid = vecIntersect(vectors[0][i], vectors[1][cmpIndex], &result);
 			if(valid == 1)
 			{
-				manhatDist = fabs(result.x) + fabs(result.y);
-				if(manhatDist  < shortestDist || shortestDist == 0.0)
-					shortestDist = manhatDist;
-				//printf("Vectors collided in [0][%d] -> [1][%d]:\n", i, cmpIndex);
-				//printVec2(vectors[0][i]);
-				//printVec2(vectors[1][cmpIndex]);
-				//printPoint(result);
+				printf("Collision detected at [0][%d], [1][%d]:\n", i, cmpIndex);
+				printVec2(vectors[0][i]);
+				printVec2(vectors[1][cmpIndex]);
+				printPoint(result);
+				steps = 0;
+				// calculate sum of steps taken for both wires to get here
+				// total amount of steps taken up until the vector is in each vec2 struct
+				// need to calculate steps taken from this point until collision for both and add to get
+				// total steps taken until collision
+				steps = vectors[0][i].steps + vectors[1][cmpIndex].steps;
+				steps += abs((int)vectors[0][i].pos.x - (int)result.x) + abs((int)vectors[0][i].pos.y - (int)result.y);
+				steps += abs((int)vectors[1][cmpIndex].pos.x - (int)result.x) + abs((int)vectors[1][cmpIndex].pos.y - (int)result.y);
+				printf("Total steps taken until collision: %d\n\n", steps);
+				if(steps < minSteps || minSteps == 0)
+					minSteps = steps;
 				//getchar();
 			}
 		}
 	}
 
-	printf("Shortest distance found: %f\n", shortestDist);
+	printf("Shortest step count found: %d\n", minSteps);
 
 	return 0;
 }
@@ -203,8 +223,10 @@ int ptIntersect(Point a1, Point a2, Point b1, Point b2, Point* c)
 		return 0;
 
 	double t = ((a1.x - b1.x) * (b1.y - b2.y) - (a1.y - b1.y) * (b1.x - b2.x))/denom;
+	if(t < 0.0 || 1.0 < t)
+		return 0;
 	double u = -1.0*(((a1.x - a2.x) * (a1.y - b1.y) - (a1.y - a2.y) * (a1.x - b1.x))/denom);
-	if(t < 0.0 || 1.0 < t || u < 0.0 || 1.0 < u)
+	if(u < 0.0 || 1.0 < u)
 		return 0;
 
 	c->x = (a1.x + (t * (a2.x - a1.x)));
