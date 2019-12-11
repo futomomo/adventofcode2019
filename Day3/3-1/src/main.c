@@ -3,17 +3,17 @@
 #include <math.h>
 #include <float.h>
 
-typedef struct
+typedef struct _point
 {
 	double x, y;
 } Point;
 
-
 double lineIntersect(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4);
-Point intersectPoint(Point a1, Point a2, Point b1, Point b2);
+//Point intersectPoint(Point a1, Point a2, Point b1, Point b2);
+double slope(Point p1, Point p2);
 
-Point wires[2][302] = {0,0};
-Point lastPos;
+Point wires[2][302] = {{{0.0l,0.0l}}};
+Point lastPos = {0.0l, 0.0l};
 double shortestDist = 0.0l;
 
 int main(void)
@@ -110,9 +110,13 @@ double lineIntersect(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int
 	return 0.0l;
 }
 
+double slope(Point p1, Point p2)
+{
+	return 0.0l;
+}
 
-Point intersectPoint(Point a1, Point a2, Point b1, Point b2)
+/*Point intersectPoint(Point a1, Point a2, Point b1, Point b2)
 {
 	Point c;
 
-}
+}*/

@@ -1,7 +1,9 @@
 *.exe
 *.sw?
 *.ps1
+compile_commands.json
 
 # ignore directories
 **/build*
 **/.clangd
+**/.vscode

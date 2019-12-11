@@ -7,14 +7,6 @@ option(RELEASE_BUILD "Make a release build, otherwise defaults to debug." OFF)
 
 add_executable(day3-1 "")
 
-IF(RELEASE_BUILD)
-	message(STATUS "Setting build type to release.")
-	set(CMAKE_BUILD_TYPE "Release")
-ELSE()
-	message(STATUS "Setting build type to debug.")
-	set(CMAKE_BUILD_TYPE "Debug")
-ENDIF()
-
 target_compile_options(day3-1 PUBLIC "-D_CRT_SECURE_NO_WARNINGS")
 
 add_subdirectory(src)
