@@ -22,6 +22,14 @@ set_target_properties(mainapp
 if(EXISTS "${CMAKE_SOURCE_DIR}/input.txt")
 	configure_file("${CMAKE_SOURCE_DIR}/input.txt" "${CMAKE_BINARY_DIR}/bin/input.txt" COPYONLY)
 endif()
+if(EXISTS "${CMAKE_SOURCE_DIR}/test_in1.txt")
+	configure_file("${CMAKE_SOURCE_DIR}/test_in1.txt" "${CMAKE_BINARY_DIR}/bin/test_in1.txt" COPYONLY)
+endif()
+if(EXISTS "${CMAKE_SOURCE_DIR}/test_in2.txt")
+	configure_file("${CMAKE_SOURCE_DIR}/test_in2.txt" "${CMAKE_BINARY_DIR}/bin/test_in2.txt" COPYONLY)
+endif()
+
+
 
 
 if(WIN32)
