@@ -87,11 +87,13 @@ int loadPrg(const char* fileName)
 		if(ferror(storedMem))
 		{
 			printf("ERROR: Error on reading file\n");
+			fclose(storedMem);
 			return 0;
 		}
 		prgMem[memPtr] = memUnit;
 		fgetc(storedMem);
 	}
+	fclose(storedMem);
 	if(prgEnd == 0)
 	{
 		printf("ERROR: prgEnd == 0\n");
